@@ -31,7 +31,7 @@ A static web page with a Leaflet map and a sortable, filterable table of 235 Ora
 Every site is a **candidate**, not an eligible, approved or buildable site. Every site carries the label "Historical notice - verify current status and ownership".
 
 **Demo video:** [link, or "uploaded on the hub"]
-**Live demo:** [GitHub Pages link, once enabled]
+**Live demo:** https://legendofnath.github.io/oc-surplus-screener/
 
 ## How Claude is used
 
@@ -49,7 +49,7 @@ cd oc-surplus-screener
 python3 -m http.server 8000
 ```
 
-Then open http://localhost:8000/index.html in a browser. You need Python 3 (any recent version) and an internet connection for the map tiles. No keys or environment variables are used.
+Then open http://localhost:8000/index.html in a browser. Or skip the install and open the live demo above. You need Python 3 (any recent version) and an internet connection for the map tiles. No keys or environment variables are used.
 
 The page reads `data/scored_sites.json`. It does not call any government server when you open it.
 
