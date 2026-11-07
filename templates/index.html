@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OC surplus land: affordable housing site candidates</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.45 Arial, Helvetica, sans-serif; color: #1c1c1c; background: #fafafa; }
+  header { padding: 10px 14px; background: #fff; border-bottom: 1px solid #ddd; }
+  header h1 { margin: 0 0 4px; font-size: 18px; }
+  .note { background: #fff4d6; border: 1px solid #e0b84a; padding: 6px 10px; border-radius: 4px; font-weight: bold; }
+  .sample-flag { display: none; margin-top: 6px; background: #fde2e2; border: 1px solid #d66; padding: 6px 10px; border-radius: 4px; }
+  .tools { margin-top: 6px; font-size: 12px; color: #444; }
+  .tools button, .tools label { font: inherit; }
+  #wrap { display: flex; gap: 10px; padding: 10px; height: calc(100vh - 118px); min-height: 480px; }
+  #map { flex: 1 1 50%; min-width: 0; border: 1px solid #ccc; border-radius: 4px; }
+  #side { flex: 1 1 50%; min-width: 0; overflow: auto; background: #fff; border: 1px solid #ccc; border-radius: 4px; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { padding: 5px 6px; border-bottom: 1px solid #eee; text-align: left; vertical-align: top; }
+  th { position: sticky; top: 0; background: #eef1f5; cursor: pointer; white-space: nowrap; font-size: 12px; user-select: none; z-index: 2; }
+  th:hover { background: #dfe5ee; }
+  td.n, th.n { text-align: right; }
+  tr.row { cursor: pointer; }
+  tr.row:hover { background: #f3f7ff; }
+  tr.sel { background: #fff0b8 !important; outline: 2px solid #d9a400; }
+  .small { font-size: 12px; color: #555; }
+  .tag { display: inline-block; padding: 0 5px; border-radius: 3px; font-size: 11px; background: #e6e6e6; }
+  .tag.arch { background: #f3d4d4; }
+  .tag.ok { background: #d9efd9; }
+  .bar { display: inline-block; height: 8px; background: #3b7ddd; border-radius: 2px; vertical-align: middle; }
+  .bar-bg { display: inline-block; width: 60px; height: 8px; background: #e3e3e3; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+  .bar-bg .bar { display: block; }
+  .pop { min-width: 250px; max-width: 320px; font-size: 13px; }
+  .pop h3 { margin: 0 0 2px; font-size: 14px; }
+  .pop table td { padding: 2px 4px; border: 0; }
+  .pop .sec { margin-top: 8px; font-weight: bold; font-size: 12px; color: #333; }
+  .legend { font-size: 12px; color: #444; padding: 6px 10px; border-top: 1px solid #eee; }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; border: 1px solid #333; vertical-align: middle; margin: 0 3px 0 8px; }
+  @media (max-width: 800px) {
+    #wrap { flex-direction: column; height: auto; }
+    #map { height: 55vh; flex: none; }
+    #side { max-height: 70vh; flex: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Orange County surplus land: affordable housing site candidates</h1>
+  <div class="note">Candidates only, not confirmed eligible. All score weights are our assumptions.</div>
+  <div class="sample-flag" id="sampleFlag"><b>SAMPLE DATA.</b> These rows are made-up placeholders so the page can be tested. They are not real sites.</div>
+  <div class="tools">
+    Scores are out of 100: still available (30), size (20), zoning or housing-element list (20), hazards (15), transit (15). Every one of these maximums is an assumption.
+    &nbsp;|&nbsp; <label>Test another data file: <input type="file" id="fileIn" accept=".json,application/json"></label>
+  </div>
+</header>
+
+<div id="wrap">
+  <div id="map"></div>
+  <div id="side">
+    <table id="tbl">
+      <thead><tr>
+        <th class="n" data-k="rank" title="Rank by total score">#</th>
+        <th data-k="address">Site</th>
+        <th data-k="city">City</th>
+        <th class="n" data-k="acres">Acres</th>
+        <th data-k="status">Status</th>
+        <th class="n" data-k="total">Score (of 100)</th>
+        <th class="n" data-k="available" title="Max 30 (assumption)">Avail.<br>/30</th>
+        <th class="n" data-k="size" title="Max 20 (assumption)">Size<br>/20</th>
+        <th class="n" data-k="zoning" title="Max 20 (assumption)">Zoning<br>/20</th>
+        <th class="n" data-k="hazards" title="Max 15 (assumption)">Hazard<br>/15</th>
+        <th class="n" data-k="transit" title="Max 15 (assumption)">Transit<br>/15</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="legend">Pin color = total score:
+      <span class="dot" style="background:#2e7d32"></span>70+
+      <span class="dot" style="background:#f9a825"></span>40 to 69
+      <span class="dot" style="background:#c62828"></span>under 40
+      &nbsp;(these cutoffs are assumptions too). Click a row or a pin. Click a column heading to sort.
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="siteData">[
+ {
+  "id": "SAMPLE-1",
+  "apn": "000-000-01",
+  "address": "100 Example Ave (sample)",
+  "city": "Santa Ana",
+  "lat": 33.7455,
+  "lon": -117.8677,
+  "acres": 4.2,
+  "general_plan": "Urban Neighborhood",
+  "zoning_listed": "R-3",
+  "existing_use": "Vacant lot",
+  "status": "Available",
+  "source_url": "https://example.org/sample-notice-1",
+  "checks": {
+   "zoning_scag": "Multi-family residential",
+   "housing_element_site": true,
+   "flood_zone": "X (minimal hazard)",
+   "fire_zone": "Not in a fire severity zone",
+   "in_hqta": false
+  },
+  "score": {
+   "total": 79,
+   "available": 30,
+   "size": 14,
+   "zoning": 20,
+   "hazards": 15,
+   "transit": 0
+  },
+  "SAMPLE": true,
+  "sources": {
+   "zoning_scag": "https://maps.scag.ca.gov/scaggis/rest/services/LDX/Zoning_poly_OR/MapServer",
+   "housing_element_site": "https://maps.scag.ca.gov/scaggis/rest/services/LDX/HousingElementSite_poly_scag/MapServer",
+   "flood_zone": "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer",
+   "fire_zone": "https://services.gis.ca.gov/arcgis/rest/services/Environment/Fire_Severity_Zones/MapServer",
+   "in_hqta": "https://caltrans-gis.dot.ca.gov/arcgis/rest/services/CHrailroad/CA_HQ_Transit_Areas/FeatureServer/0"
+  }
+ },
+ {
+  "id": "SAMPLE-2",
+  "apn": "000-000-02",
+  "address": "200 Sample St (sample)",
+  "city": "Anaheim",
+  "lat": 33.8366,
+  "lon": -117.9143,
+  "acres": 1.1,
+  "general_plan": "Commercial",
+  "zoning_listed": "C-G",
+  "existing_use": "Parking lot",
+  "status": "Archive",
+  "source_url": "https://example.org/sample-notice-2",
+  "checks": {
+   "zoning_scag": "General commercial",
+   "housing_element_site": false,
+   "flood_zone": "X (minimal hazard)",
+   "fire_zone": "Not in a fire severity zone",
+   "in_hqta": true
+  },
+  "score": {
+   "total": 40,
+   "available": 0,
+   "size": 5,
+   "zoning": 10,
+   "hazards": 10,
+   "transit": 15
+  },
+  "SAMPLE": true,
+  "sources": {
+   "zoning_scag": "https://maps.scag.ca.gov/scaggis/rest/services/LDX/Zoning_poly_OR/MapServer",
+   "housing_element_site": "https://maps.scag.ca.gov/scaggis/rest/services/LDX/HousingElementSite_poly_scag/MapServer",
+   "flood_zone": "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer",
+   "fire_zone": "https://services.gis.ca.gov/arcgis/rest/services/Environment/Fire_Severity_Zones/MapServer",
+   "in_hqta": "https://caltrans-gis.dot.ca.gov/arcgis/rest/services/CHrailroad/CA_HQ_Transit_Areas/FeatureServer/0"
+  }
+ },
+ {
+  "id": "SAMPLE-3",
+  "apn": "000-000-03",
+  "address": "300 Demo Blvd (sample)",
+  "city": "Irvine",
+  "lat": 33.6846,
+  "lon": -117.8265,
+  "acres": 9.8,
+  "general_plan": "Mixed Use",
+  "zoning_listed": "MU",
+  "existing_use": "Former school",
+  "status": "Available",
+  "source_url": "https://example.org/sample-notice-3",
+  "checks": {
+   "zoning_scag": "Mixed use",
+   "housing_element_site": false,
+   "flood_zone": "AE (high flood risk)",
+   "fire_zone": "Not in a fire severity zone",
+   "in_hqta": true
+  },
+  "score": {
+   "total": 80,
+   "available": 30,
+   "size": 20,
+   "zoning": 10,
+   "hazards": 5,
+   "transit": 15
+  },
+  "SAMPLE": true,
+  "sources": {
+   "zoning_scag": "https://maps.scag.ca.gov/scaggis/rest/services/LDX/Zoning_poly_OR/MapServer",
+   "housing_element_site": "https://maps.scag.ca.gov/scaggis/rest/services/LDX/HousingElementSite_poly_scag/MapServer",
+   "flood_zone": "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer",
+   "fire_zone": "https://services.gis.ca.gov/arcgis/rest/services/Environment/Fire_Severity_Zones/MapServer",
+   "in_hqta": "https://caltrans-gis.dot.ca.gov/arcgis/rest/services/CHrailroad/CA_HQ_Transit_Areas/FeatureServer/0"
+  }
+ }
+]</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function () {
+  var MAX = { available: 30, size: 20, zoning: 20, hazards: 15, transit: 15 };
+  var LABEL = { available: "Still available", size: "Size", zoning: "Zoning / housing-element list", hazards: "Hazards (flood, fire)", transit: "High-quality transit area" };
+  var CHECKS = [
+    ["zoning_scag", "Zoning (SCAG)"],
+    ["housing_element_site", "On a housing-element site list"],
+    ["flood_zone", "Flood zone (FEMA)"],
+    ["fire_zone", "Fire severity zone (CAL FIRE)"],
+    ["in_hqta", "In a high-quality transit area"]
+  ];
+
+  var sites = [], markers = {}, selectedId = null, sortKey = "rank", sortDir = 1;
+  var map = L.map("map").setView([33.72, -117.85], 10);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+  var layer = L.layerGroup().addTo(map);
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function safeUrl(u) { return /^https?:\/\//i.test(u || "") ? u : ""; }
+  function link(u, text) { u = safeUrl(u); return u ? '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(text) + "</a>" : esc(text); }
+  function num(v) { return typeof v === "number" && isFinite(v) ? v : null; }
+  function sc(s, k) { return s.score && num(s.score[k]) != null ? s.score[k] : null; }
+  function color(t) { return t == null ? "#777" : t >= 70 ? "#2e7d32" : t >= 40 ? "#f9a825" : "#c62828"; }
+  function show(v) {
+    if (v === true) return "Yes";
+    if (v === false) return "No";
+    if (v == null || v === "") return "not checked";
+    return String(v);
+  }
+
+  function prep(data) {
+    sites = (Array.isArray(data) ? data : []).filter(function (s) { return num(s.lat) != null && num(s.lon) != null; });
+    sites.sort(function (a, b) {
+      return (sc(b, "total") || 0) - (sc(a, "total") || 0) || (b.acres || 0) - (a.acres || 0);
+    });
+    sites.forEach(function (s, i) { s._rank = i + 1; });
+    document.getElementById("sampleFlag").style.display = sites.some(function (s) { return s.SAMPLE; }) ? "block" : "none";
+  }
+
+  function popupHtml(s) {
+    var h = '<div class="pop"><h3>#' + s._rank + " " + esc(s.address || "(no address)") + "</h3>";
+    h += '<div class="small">' + esc(s.city) + (s.apn ? " | APN " + esc(s.apn) : "") + (s.SAMPLE ? ' | <b style="color:#b00">SAMPLE</b>' : "") + "</div>";
+    h += '<div class="small">' + (num(s.acres) != null ? s.acres + " acres" : "acres unknown") + " | status: " + esc(s.status || "unknown") + "</div>";
+    h += '<div class="small">General plan: ' + esc(s.general_plan || "n/a") + " | zoning listed: " + esc(s.zoning_listed || "n/a") + " | use: " + esc(s.existing_use || "n/a") + "</div>";
+    h += '<div class="small">' + link(s.source_url, "Original surplus-land notice") + "</div>";
+    var t = sc(s, "total");
+    h += '<div class="sec">Score: ' + (t == null ? "n/a" : t + " of 100") + ' <span class="small">(weights are assumptions)</span></div><table>';
+    Object.keys(MAX).forEach(function (k) {
+      var v = sc(s, k), pct = v == null ? 0 : Math.max(0, Math.min(100, v / MAX[k] * 100));
+      h += "<tr><td>" + LABEL[k] + '</td><td><span class="bar-bg"><span class="bar" style="width:' + pct + '%"></span></span>' + (v == null ? "n/a" : v) + " / " + MAX[k] + "</td></tr>";
+    });
+    h += '</table><div class="sec">Checks and sources</div><table>';
+    CHECKS.forEach(function (c) {
+      var v = s.checks ? s.checks[c[0]] : null, src = s.sources ? s.sources[c[0]] : "";
+      h += "<tr><td>" + c[1] + "</td><td>" + esc(show(v)) + (safeUrl(src) ? " (" + link(src, "source") + ")" : "") + "</td></tr>";
+    });
+    h += "</table></div>";
+    return h;
+  }
+
+  function drawMap() {
+    layer.clearLayers(); markers = {};
+    var pts = [];
+    sites.forEach(function (s) {
+      var m = L.circleMarker([s.lat, s.lon], { radius: 9, color: "#222", weight: 1.5, fillColor: color(sc(s, "total")), fillOpacity: 0.9 });
+      m.bindPopup(popupHtml(s), { maxWidth: 340 });
+      m.bindTooltip("#" + s._rank + " " + (s.address || ""));
+      m.on("click", function () { select(s.id, false); });
+      m.addTo(layer); markers[s.id] = m; pts.push([s.lat, s.lon]);
+    });
+    if (pts.length) map.fitBounds(pts, { padding: [40, 40], maxZoom: 13 });
+  }
+
+  function val(s, k) {
+    if (k === "rank") return s._rank;
+    if (["total", "available", "size", "zoning", "hazards", "transit"].indexOf(k) >= 0) return sc(s, k);
+    if (k === "acres") return num(s.acres);
+    return (s[k] || "").toString().toLowerCase();
+  }
+
+  function drawTable() {
+    var rows = sites.slice().sort(function (a, b) {
+      var x = val(a, sortKey), y = val(b, sortKey);
+      if (x == null) return 1; if (y == null) return -1;
+      return (x < y ? -1 : x > y ? 1 : 0) * sortDir;
+    });
+    var tb = document.querySelector("#tbl tbody"), h = "";
+    rows.forEach(function (s) {
+      var arch = /archive/i.test(s.status || "");
+      h += '<tr class="row' + (s.id === selectedId ? " sel" : "") + '" data-id="' + esc(s.id) + '">' +
+        '<td class="n">' + s._rank + "</td>" +
+        "<td>" + esc(s.address || "(no address)") + (s.SAMPLE ? ' <span class="tag arch">SAMPLE</span>' : "") + '<div class="small">' + esc(s.apn ? "APN " + s.apn : "") + "</div></td>" +
+        "<td>" + esc(s.city) + "</td>" +
+        '<td class="n">' + (num(s.acres) != null ? s.acres : "") + "</td>" +
+        '<td><span class="tag ' + (arch ? "arch" : "ok") + '">' + esc(s.status || "unknown") + "</span></td>" +
+        '<td class="n"><b>' + (sc(s, "total") == null ? "n/a" : sc(s, "total")) + "</b></td>";
+      ["available", "size", "zoning", "hazards", "transit"].forEach(function (k) {
+        h += '<td class="n">' + (sc(s, k) == null ? "" : sc(s, k)) + "</td>";
+      });
+      h += "</tr>";
+    });
+    tb.innerHTML = h || '<tr><td colspan="11" class="small">No sites with a latitude and longitude were found in the data.</td></tr>';
+  }
+
+  function select(id, fromTable) {
+    selectedId = id;
+    drawTable();
+    var row = document.querySelector('#tbl tbody tr[data-id="' + id.replace(/"/g, '\\"') + '"]');
+    if (row && !fromTable) row.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    var m = markers[id];
+    Object.keys(markers).forEach(function (k) { markers[k].setStyle({ weight: k === id ? 4 : 1.5, color: k === id ? "#0033cc" : "#222", radius: k === id ? 12 : 9 }); });
+    if (m && fromTable) {
+      map.setView(m.getLatLng(), Math.max(map.getZoom(), 15), { animate: true });
+      m.openPopup();
+      m.bringToFront();
+    }
+  }
+
+  document.querySelector("#tbl tbody").addEventListener("click", function (e) {
+    var tr = e.target.closest("tr.row");
+    if (tr && !e.target.closest("a")) select(tr.getAttribute("data-id"), true);
+  });
+  document.querySelectorAll("#tbl th").forEach(function (th) {
+    th.addEventListener("click", function () {
+      var k = th.getAttribute("data-k");
+      if (sortKey === k) sortDir = -sortDir; else { sortKey = k; sortDir = (k === "rank" || k === "address" || k === "city" || k === "status") ? 1 : -1; if (k === "rank") sortDir = 1; }
+      drawTable();
+    });
+  });
+
+  function load(data) { selectedId = null; sortKey = "rank"; sortDir = 1; prep(data); drawMap(); drawTable(); }
+
+  document.getElementById("fileIn").addEventListener("change", function (e) {
+    var f = e.target.files[0]; if (!f) return;
+    var r = new FileReader();
+    r.onload = function () {
+      try { load(JSON.parse(r.result)); } catch (err) { alert("That file is not valid JSON: " + err.message); }
+    };
+    r.readAsText(f);
+  });
+
+  load(JSON.parse(document.getElementById("siteData").textContent));
+})();
+</script>
+</body>
+</html>
