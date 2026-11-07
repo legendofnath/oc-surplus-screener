@@ -63,6 +63,7 @@
   <label>City <select id="fCity"><option value="">All cities</option></select></label>
   <label>Minimum score <input type="range" id="fMin" min="0" max="100" value="0"> <b id="fMinVal">0</b></label>
   <label>Search <input type="search" id="fText" placeholder="address, APN, use..."></label>
+  <button id="csvBtn" type="button" style="font:inherit;padding:5px 10px;border:1px solid var(--line);border-radius:5px;background:#fff;cursor:pointer">Download shortlist (CSV)</button>
   <span class="count" id="shown"></span>
 </div>
 
@@ -237,6 +238,19 @@
     if (m) m.openPopup();
   }
 
+  function exportCsv() {
+    var head = ["rank", "id", "score", "address", "apn", "city", "acres", "existing_use", "zoning_scag", "flood_zone", "fire_zone", "in_transit_area", "notice_issued", "original_notice_url", "status_note"];
+    function cell(v) { v = (v === null || v === undefined) ? "" : String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+    var lines = [head.join(",")];
+    view.forEach(function (o, i) {
+      var c = o.checks || {};
+      lines.push([i + 1, o.id, o.score ? o.score.total : "", o.address, o.apn, o.city, o.acres, o.existing_use, c.zoning_scag, c.flood_zone, c.fire_zone, c.in_hqta, o.notice_issued, o.source_url, "Historical notice - verify current status and ownership"].map(cell).join(","));
+    });
+    var blob = new Blob(["\ufeff" + lines.join("\r\n")], { type:"text/csv;charset=utf-8" });
+    var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "oc-surplus-shortlist.csv";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }
+
   function init(rows, isSample) {
     data = rows;
     addrCount = {}; data.forEach(function (o) { var k = addrKey(o); if (k) addrCount[k] = (addrCount[k] || 0) + 1; });
@@ -246,6 +260,7 @@
     Object.keys(cities).sort().forEach(function (c) { var op = document.createElement("option"); op.value = c; op.textContent = c; $("fCity").appendChild(op); });
     ["fCity", "fText"].forEach(function (id) { $(id).oninput = render; });
     $("fMin").oninput = function () { $("fMinVal").textContent = $("fMin").value; render(); };
+    $("csvBtn").onclick = exportCsv;
     render();
     var pts = data.filter(function (o) { return typeof o.lat === "number" && typeof o.lon === "number"; }).map(function (o) { return [o.lat, o.lon]; });
     if (pts.length > 1) map.fitBounds(pts, { padding:[20, 20] });
