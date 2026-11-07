@@ -83,7 +83,7 @@ Every number we made up is labelled ASSUMPTION here and in the tool.
 | Map and table page | Working |
 | Live government lookups when the page opens | Not built; results are saved in the data file |
 | Current ownership or availability | Not checked. Not available in the data |
-| Newport Beach city-owned lots (`data/newport/`) | Real data, not yet used in the app |
+| Newport Beach lot dataset (`Newport_Beach_lots_master.xlsx`, 29,355 lots with general plan, zoning, lot size and census-block data; no owner names) | Real public data added by a teammate to widen our scope. Not yet scored or shown in the app |
 
 ## Where it gets things wrong
 
@@ -99,7 +99,7 @@ Every number we made up is labelled ASSUMPTION here and in the tool.
 
 ## Next steps
 
-For a nonprofit or city to use this next month: confirm current ownership and status for the top sites, re-run the transit check from a second source, add slope and contamination checks, let users change the weights, and refresh the notice data on a schedule. With one more week we would add the Newport Beach lots and test the ranking with a real acquisitions team.
+For a nonprofit or city to use this next month: confirm current ownership and status for the top sites, re-run the transit check from a second source, add slope and contamination checks, let users change the weights, and refresh the notice data on a schedule. With one more week we would score the Newport Beach lots with the same checks and test the ranking with a real acquisitions team.
 
 ## Data and privacy
 
