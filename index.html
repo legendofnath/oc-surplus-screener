@@ -74,6 +74,7 @@
       <span class="dot" style="background:#c77d00"></span>50 to 69
       <span class="dot" style="background:#a33a3a"></span>under 50</div>
     <div class="panel" id="detail"><h2>Select a site</h2><p class="small">Click a row in the table or a pin on the map to see the score breakdown, the checks and the source links.</p></div>
+    <details class="panel"><summary><b>How scoring works (every weight is an ASSUMPTION)</b></summary><ul style="font-size:14px"><li>Zoning /25: 25 if on a SCAG housing-element site or residential zoning; 15 for commercial, office, retail, hotel or Specific Plan (ASSUMPTION: a specific plan may or may not allow housing); 5 for public, industrial or open space; 0 if unknown.</li><li>Size /20: full marks at 2 acres or more, scaled below that; 0 if acreage is unknown.</li><li>Existing use /15: vacant 15, parking 12, gas station 8, nothing listed 5, golf, open space or trail 2, anything else 3.</li><li>Hazards /15: start at 15, minus 8 in a FEMA special flood hazard area, minus 7, 5 or 2 for CAL FIRE Very High, High or Moderate. A hazard that could not be checked is listed as missing, never treated as safe.</li><li>Transit /15: 15 if inside a Caltrans high-quality transit area.</li><li>Recency /10: 10 for a 2026 notice, minus 2 for each year older, never below 0.</li></ul><p class="small">These are our own weights, not a legal rule. This is a screening aid, not an eligibility determination.</p></details>
   </section>
   <section>
     <div class="tablewrap">
@@ -97,7 +98,8 @@
       checks:{zoning_scag:"sample",housing_element_site:null,flood_zone:null,fire_zone:null,in_hqta:null},
       score:{total:50,zoning:10,size:20,existing_use:15,hazards:0,transit:0,recency:5}, data_gaps:[], sources:{} }
   ];
-  var data = [], view = [], markers = {}, selectedId = null;
+  var data = [], view = [], markers = {}, selectedId = null, addrCount = {};
+  function addrKey(o) { return o.address && o.address.trim() ? o.address.trim().toLowerCase() : ""; }
   var sortKey = "total", sortAsc = false;
 
   var map = L.map("map").setView([33.72, -117.88], 10);
@@ -123,7 +125,7 @@
     { k:"rank", t:"#", get:function (o, i) { return i + 1; }, sort:false },
     { k:"total", t:"Score", get:function (o) { return o.score ? o.score.total : null; } },
     { k:"city", t:"City", get:function (o) { return o.city || ""; } },
-    { k:"name", t:"Address / APN", get:name },
+    { k:"name", t:"Address / APN", get:function (o) { var n = addrCount[addrKey(o)] || 0; return name(o) + (n > 1 ? " (" + n + " parcels)" : ""); } },
     { k:"acres", t:"Acres", get:function (o) { return o.acres; } },
     { k:"use", t:"Existing use", get:function (o) { return o.existing_use || ""; } },
     { k:"zone", t:"Zoning (SCAG)", get:function (o) { return zone(o) || ""; } },
@@ -217,6 +219,7 @@
       row("Flood zone", esc(c.flood_zone == null ? "unknown" : c.flood_zone) + sfha + src(o, "flood_zone")) +
       row("Fire severity", esc(c.fire_zone == null ? "unknown" : c.fire_zone) + src(o, "fire_zone")) +
       row("High-quality transit", tri(c.in_hqta, "Inside a transit area", "Not in a transit area") + src(o, "in_hqta") + (o.transit_note ? "<div class='small'>" + esc(o.transit_note) + "</div>" : "")) +
+      (addrCount[addrKey(o)] > 1 ? row("Same address", esc(addrCount[addrKey(o)]) + " parcels in this dataset share this address. They may be one larger site, so count them once.") : "") +
       row("Notice issued", esc(o.notice_issued || "unknown") + (o.source_url && safeUrl(o.source_url) ? ' <a href="' + esc(o.source_url) + '" target="_blank" rel="noopener">Original notice</a>' : "")) +
       row("Not checked / missing", gaps.length ? esc(gaps.join(", ")) : "nothing missing") +
       "</dl>";
@@ -236,6 +239,7 @@
 
   function init(rows, isSample) {
     data = rows;
+    addrCount = {}; data.forEach(function (o) { var k = addrKey(o); if (k) addrCount[k] = (addrCount[k] || 0) + 1; });
     $("sampleBanner").className = isSample ? "banner b-err" : "banner b-err hidden";
     $("count").textContent = data.length + " candidate sites";
     var cities = {}; data.forEach(function (o) { if (o.city) cities[o.city] = 1; });
