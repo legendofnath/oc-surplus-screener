@@ -30,7 +30,7 @@ A static web page with a Leaflet map and a sortable, filterable table of 235 Ora
 
 Every site is a **candidate**, not an eligible, approved or buildable site. Every site carries the label "Historical notice - verify current status and ownership".
 
-**Demo video:** [link, or "uploaded on the hub"]
+**Demo video:** uploaded with our submission on the event hub (claudesocal.com/uci-impact-lab)
 **Live demo:** https://legendofnath.github.io/oc-surplus-screener/
 
 ## How Claude is used
