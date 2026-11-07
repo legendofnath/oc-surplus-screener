@@ -1,153 +1,110 @@
-# Claude Impact Lab: UCI × SoCal Affordable Housing
+# OC Surplus Land Screener
 
-**Saturday, November 7, 2026 · Paul Merage School of Business, UC Irvine**
+> A map and ranked table that helps a small housing nonprofit decide which Orange County surplus-land notices are worth a phone call, with the zoning, hazard and transit checks shown next to each site.
 
-One day. One equation that does not balance: what a family can afford to pay, plus public subsidy,
-plus fundraising, minus the cost to create the home. In Orange County the cost side wins by six
-figures per home. Small teams build a working prototype with Claude that helps close the gap.
+**Team:** OC Surplus Land Screener
+**Members:** legendofnath (integrator, data, README), tanbui (checks and scoring), carcollector25 (app)
+**Lane:** 1 Find it ("Where can the next affordable home go?")
+**Built at:** Claude Impact Lab: UCI × SoCal Affordable Housing, November 7, 2026
 
-Organized by Claude Community Orange County with the UCI Center for Real Estate. Sponsor: EyeOn
-Automations.
+## The real user
 
-**The challenge brief** (3 pages: the $0 equation, the three lanes, a worked example, judging): [docs/challenge-brief.pdf](docs/challenge-brief.pdf).
-The kickoff slides: [docs/kickoff-slides.pdf](docs/kickoff-slides.pdf).
+This is a made-up user based on scenario F02 in `lanes/1-find-it/scenarios.json`: a one-person acquisitions team at a small housing nonprofit with no GIS staff. They ask, "Give me ten sites in one city I should call about this month, and why each one." No real person or organization is described.
 
-**First hackathon?** You do not need a team, an idea or coding experience to start. Read
-[your first hackathon](docs/first-hackathon.md). Two minutes.
+**Before:** Public surplus-land notices sit in a state spreadsheet. To judge one site they open the notice, look up the zoning on a city map, check a flood map, check a fire-hazard map and look for nearby transit, one parcel at a time. Doing that for hundreds of notices takes days, so most are never looked at.
 
-## One link for everything
+**After:** They open one page, see all 235 Orange County notices on a map and in a ranked table, filter to a city, and click a site to see its score broken into six parts, with a source link for every check. They leave with a short shortlist of sites to verify and call about.
 
-**<https://claudesocal.com/uci-impact-lab>**
+## What we built
 
-| On the hub | What it is |
-|---|---|
-| `#teams` | Register your team (by 10:00 AM) |
-| `#submit` | The submission form (due 2:30 PM) |
-| `#credits` | Your Claude API credits |
+A static web page with a Leaflet map and a sortable, filterable table of 235 Orange County surplus-land notices. Each site gets a 0-100 screening score from public data:
 
-## Bring
+| Part | Max | Basis |
+|---|---|---|
+| Zoning | 25 | On a SCAG housing-element site, or SCAG regional zoning category |
+| Size | 20 | Acres (2 acres or more gets full marks) |
+| Existing use | 15 | Vacant or parking lot scores higher |
+| Hazards | 15 | Deduct for FEMA special flood hazard area and CAL FIRE severity |
+| Transit | 15 | Inside a transit priority area |
+| Recency | 10 | Newer notices score higher |
 
-- A laptop and its charger
-- A free [GitHub](https://github.com/signup) account. One per team is enough to start
-- A Claude account at [claude.ai](https://claude.ai)
-- Event credits: $100 in Claude API credits per person (API only, not Claude.ai). The claim link is on the hub at 9:15 AM. Claim using your Org ID from [console.anthropic.com](https://console.anthropic.com), not your Claude.ai ID. One claim per person. Credits are tied to the email you registered with, so people who registered on the day may not get them
+Every site is a **candidate**, not an eligible, approved or buildable site. Every site carries the label "Historical notice - verify current status and ownership".
 
-Wi-Fi: UCI-guest.
+**Demo video:** [link, or "uploaded on the hub"]
+**Live demo:** [GitHub Pages link, once enabled]
 
-## The day
+## How Claude is used
 
-| Time | What |
-|---|---|
-| 8:15 AM | Check-in and breakfast |
-| 9:00 AM | Kickoff in the auditorium. The lanes are revealed |
-| 9:30 AM | Anthropic build workshop, in the auditorium |
-| By 10:00 AM | Register your team on the hub (`#teams`) |
-| 10:00 AM | Go to the room your team picked |
-| Around noon | Lunch |
-| **2:30 PM** | **Submissions due.** Hub form, public repo and a demo video (30 seconds ideal). Anthropic Q&A for anyone who wants it |
-| 3:00 PM | Finalists announced. They present live in the auditorium |
-| 4:00 PM | Judges deliberate |
-| 4:15 PM | Winners and photos |
+- **Building:** Claude pulled the notices from the state open-data portal, queried the public map services for each of the 235 sites, wrote the scoring, and built the data files and page. Three teammates with no coding experience each worked through their own Claude.
+- **Inside the tool:** nothing runs live. The checks were run once and saved to `data/scored_sites.json`; the page only reads that file.
+- **What a person checks:** the user must confirm zoning with the city, and ownership and current status of any site, before acting. We plan to hand-check the top-ranked sites against the source maps.
 
-## The three lanes
+## Try it
 
-Teams of up to 5, ideally one of each role: builder/engineer, creative/designer,
-communicator/presenter, organizer/facilitator. Solo is fine to start: the hub's team board shows
-teams with open seats and the roles they want. Each team picks a room on the hub (rooms fill up as teams register), goes there, and picks one
-lane together. Any lane works in any room.
+The page loads a local JSON file, so it needs a local web server.
 
-| | Lane | The question | Who is stuck |
-|---|---|---|---|
-| 1 | [**Find it**](lanes/1-find-it/README.md) | Where can the next affordable home go? | An acquisitions lead with no GIS team, a congregation with an underused lot, city housing staff |
-| 2 | [**Clear it**](lanes/2-clear-it/README.md) | How do we turn four years into two? | A nonprofit project manager, a small builder, a homeowner adding an ADU, a city permit tech |
-| 3 | [**Fund it**](lanes/3-fund-it/README.md) | Does it pencil, and who closes the gap? | A nonprofit finance lead, a development director, a donor, a city housing analyst |
-
-Each lane page has the problem, who is stuck, the open question, a few ideas to get you thinking
-(not a spec) and a list of data to start from. Build what your team thinks will help.
-
-New to this field? The short [background](docs/background.md) and the [glossary](docs/glossary.md)
-cover the equation, the laws and the terms you will hear.
-
-## Your first 15 minutes
-
-1. **Get the files.** Use this repo as a template for your team, or download it as a ZIP.
-   [Getting started](docs/getting-started.md) shows both, and three ways to work with Claude:
-   in the browser, in the desktop app, or in a terminal.
-2. **Claim your credits** from the hub (`#credits`) once the link is up at 9:15 AM.
-3. **Register your team** on the hub (`#teams`) by 10:00 AM.
-4. **Name one real user.** Write down who they are and what their day looks like before and after.
-   Then open your lane's data list and look at what is there.
-
-## Before you build
-
-1. **Start with one real person** and the problem they're stuck on. Show their before and after.
-2. **Bend the brief** if it serves the goal: more affordable homes in Southern California.
-3. **Play fair with data.** Public or provided data only. Don't overload or abuse city websites.
-   No private plans or blueprints without permission, and no personal information about real
-   tenants, buyers or residents.
-
-The full version, with the reasons, is in [ground rules](docs/ground-rules.md).
-
-## Submit by 2:30 PM
-
-One per team:
-
-- the submission form at [claudesocal.com/uci-impact-lab](https://claudesocal.com/uci-impact-lab) (`#submit`)
-- a public GitHub repo with a README (see the [repo rules](docs/submission.md#repo-rules-so-judges-can-check-it-works))
-- a demo video made with Claude's help (30 seconds is ideal, up to 2 minutes)
-
-[How to submit](docs/submission.md).
-
-## Judging
-
-Judges first shortlist from all submissions. Finalists present live in the auditorium. Each
-finalist is scored from 1 to 5 in four areas. The areas have equal weight.
-
-| Area | The question |
-|---|---|
-| **Impact** | Would a nonprofit or city use it next month to help get homes built? |
-| **Works** | Does the live demo run on real data, with sources shown? Working beats polished |
-| **Scale** | Is there a believable path to the next 100 projects? |
-| **Innovation** | Is it a new way to see or solve the problem? |
-
-Ties go to Impact.
-
-Prizes: overall 1st, 2nd and 3rd, plus a winner in each lane. A live demo is required for
-finalists. Slides alone do not place. More in [judging](docs/judging.md).
-
-## Help
-
-- **About the day, the repo or your setup:** find an organizer.
-- **About your lane:** ask in your breakout room.
-- **Stuck on setup:** ask early. Nobody should lose the morning to an install.
-- **Something looks like real personal information:** stop and tell an organizer right away.
-
-## What is in this repo
-
-```text
-README.md            this page
-CLAUDE.md            instructions Claude Code reads when you open this repo
-docs/
-  first-hackathon.md   what to expect if this is your first one
-  getting-started.md   get the files, set up Claude
-  ground-rules.md      the rules in full
-  submission.md        what to hand in and how
-  challenge-brief.pdf  the 3-page brief handed out at kickoff
-  kickoff-slides.pdf   the slides from the morning kickoff
-  judging.md           how winners are picked
-  background.md        the $0 equation and the laws, in two pages
-  glossary.md          the terms you will hear
-lanes/
-  1-find-it/     problem, ideas, scenarios.json, data/ (DATA-SOURCES.md, pathways.json)
-  2-clear-it/    problem, ideas, scenarios.json, data/ (DATA-SOURCES.md, oc-cities.json, timeline.json)
-  3-fund-it/     problem, ideas, scenarios.json, data/ (DATA-SOURCES.md, synthetic-example-deal.json)
-templates/TEAM-README.md          the README your team's repo needs
+```bash
+git clone https://github.com/legendofnath/oc-surplus-screener.git
+cd oc-surplus-screener
+python3 -m http.server 8000
 ```
+
+Then open http://localhost:8000/index.html in a browser. You need Python 3 (any recent version) and an internet connection for the map tiles. No keys or environment variables are used.
+
+The page reads `data/scored_sites.json`. It does not call any government server when you open it.
+
+## Sources and assumptions
+
+| Item | Source or assumption | Date checked |
+|---|---|---|
+| Surplus land notices (235 Orange County rows) | HCD Surplus Land Act notices of availability, https://data.ca.gov/dataset/surplus-land-act-notices-of-availability-received. Self-reported by local agencies; HCD does not verify it | 2026-11-07 |
+| Zoning | SCAG Zoning_poly_OR, regional category `ZN24_SCAG`, matched by parcel number, else by point | 2026-11-07 |
+| Housing-element sites | SCAG HousingElementSite_poly_scag | 2026-11-07 |
+| Flood | FEMA National Flood Hazard Layer, layer 28 | 2026-11-07 |
+| Fire | CAL FIRE Fire Hazard Severity Zones (state and local responsibility areas). Older vintage, as published on the state GIS service | 2026-11-07 |
+| Transit | **Proxy.** The Caltrans High Quality Transit Areas service could not be reached in our browser, so we used SCAG's 2050 Transit Priority Areas (a planned future network). This can overstate transit access today | 2026-11-07 |
+| Notice status | Every Orange County notice in the dataset is "Archive" (the notice window closed). That does not mean the land is gone, only that availability must be verified | 2026-11-07 |
+| Zoning weight 25, size 20, existing use 15, hazards 15, transit 15, recency 10 | ASSUMPTION: our own weights, not from any law or program | n/a |
+| Zoning points by SCAG category | ASSUMPTION: residential 25, commercial and office 15, public, industrial and open space 5, unknown 0 | n/a |
+| Specific Plan zoning scores 15 | ASSUMPTION: a specific plan may or may not allow housing, so we gave it a middle score. 116 sites fall in this group | n/a |
+| Size score reaches full marks at 2 acres | ASSUMPTION | n/a |
+| Existing-use points (vacant 15, parking 12, gas 8, other 3, and so on) | ASSUMPTION | n/a |
+| Recency: 10 points for a 2026 notice, minus 2 per year older | ASSUMPTION | n/a |
+
+Every number we made up is labelled ASSUMPTION here and in the tool.
+
+## What is real and what is mocked
+
+| Part | Status |
+|---|---|
+| 235 Orange County notices (`data/sites.json`) | Real, from the state dataset |
+| Zoning, housing-element, flood, fire and transit checks | Real queries to public map services, run once on 2026-11-07 |
+| Scores and weights | Working, but the weights are assumptions |
+| Map and table page | Working |
+| Live government lookups when the page opens | Not built; results are saved in the data file |
+| Current ownership or availability | Not checked. Not available in the data |
+| Newport Beach city-owned lots (`data/newport/`) | Real data, not yet used in the app |
+
+## Where it gets things wrong
+
+- **Transit is a proxy** (planned 2050 network), so it can overstate transit access today.
+- **The fire layer is an older vintage**, so recent hazard changes may be missing.
+- **Historical notices.** All notices are Archive status. A site may since have been sold or committed.
+- **Self-reported data.** Local agencies filled in the notices, and HCD does not verify them.
+- **Missing fields.** 4 sites have no acreage (they score 0 on size), 2 have no city, about 11 have no zoning note from the city, and 7 did not match a SCAG zoning record (they score 0 on zoning). These are flagged in each site's `data_gaps`.
+- **Housing-element match is narrow.** Only 1 of the 235 sites matched a housing-element site, and 2 could not be checked.
+- **Zoning is a regional category, not the city's legal zoning.** A site flagged as residential still needs a planning check.
+- **Weights are our assumptions**, so ranking is a screening aid, not a legal or financial determination.
+- **Duplicate parcels.** Some parcels appear next to each other with the same address or lot, and may be one larger site.
+
+## Next steps
+
+For a nonprofit or city to use this next month: confirm current ownership and status for the top sites, replace the transit proxy with the Caltrans service, add slope and contamination checks, let users change the weights, and refresh the notice data on a schedule. With one more week we would add the Newport Beach lots and test the ranking with a real acquisitions team.
+
+## Data and privacy
+
+This project uses only public or provided data. It contains no personal information about real tenants, buyers or residents. It does not file applications or contact any city or person.
 
 ## License
 
-Code in this repo is released under the [MIT License](LICENSE). The brief, lane pages and glossary
-text are dedicated to the public domain (CC0). Third-party data, laws and documents linked here
-stay under their own terms.
-
-Teams own what they build. See [ground rules](docs/ground-rules.md).
+MIT, see the LICENSE file in this repo.
