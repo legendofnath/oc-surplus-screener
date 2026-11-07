@@ -25,7 +25,7 @@ A static web page with a Leaflet map and a sortable, filterable table of 235 Ora
 | Size | 20 | Acres (2 acres or more gets full marks) |
 | Existing use | 15 | Vacant or parking lot scores higher |
 | Hazards | 15 | Deduct for FEMA special flood hazard area and CAL FIRE severity |
-| Transit | 15 | Inside a transit priority area |
+| Transit | 15 | Inside a Caltrans high-quality transit area |
 | Recency | 10 | Newer notices score higher |
 
 Every site is a **candidate**, not an eligible, approved or buildable site. Every site carries the label "Historical notice - verify current status and ownership".
@@ -62,7 +62,7 @@ The page reads `data/scored_sites.json`. It does not call any government server 
 | Housing-element sites | SCAG HousingElementSite_poly_scag | 2026-11-07 |
 | Flood | FEMA National Flood Hazard Layer, layer 28 | 2026-11-07 |
 | Fire | CAL FIRE Fire Hazard Severity Zones (state and local responsibility areas). Older vintage, as published on the state GIS service | 2026-11-07 |
-| Transit | **Proxy.** The Caltrans High Quality Transit Areas service could not be reached in our browser, so we used SCAG's 2050 Transit Priority Areas (a planned future network). This can overstate transit access today | 2026-11-07 |
+| Transit | Caltrans High Quality Transit Areas (HQTA), https://caltrans-gis.dot.ca.gov/arcgis/rest/services/CHrailroad/CA_HQ_Transit_Areas/FeatureServer/0, point-in-polygon on each site. The service was unreachable from one of our browsers, so the results come from a second run by a teammate and were not independently re-run | 2026-11-07 |
 | Notice status | Every Orange County notice in the dataset is "Archive" (the notice window closed). That does not mean the land is gone, only that availability must be verified | 2026-11-07 |
 | Zoning weight 25, size 20, existing use 15, hazards 15, transit 15, recency 10 | ASSUMPTION: our own weights, not from any law or program | n/a |
 | Zoning points by SCAG category | ASSUMPTION: residential 25, commercial and office 15, public, industrial and open space 5, unknown 0 | n/a |
@@ -87,7 +87,7 @@ Every number we made up is labelled ASSUMPTION here and in the tool.
 
 ## Where it gets things wrong
 
-- **Transit is a proxy** (planned 2050 network), so it can overstate transit access today.
+- **Transit is a yes/no check** against Caltrans HQTA polygons. It does not measure walking distance, service frequency or whether service has changed since the layer was published.
 - **The fire layer is an older vintage**, so recent hazard changes may be missing.
 - **Historical notices.** All notices are Archive status. A site may since have been sold or committed.
 - **Self-reported data.** Local agencies filled in the notices, and HCD does not verify them.
@@ -99,7 +99,7 @@ Every number we made up is labelled ASSUMPTION here and in the tool.
 
 ## Next steps
 
-For a nonprofit or city to use this next month: confirm current ownership and status for the top sites, replace the transit proxy with the Caltrans service, add slope and contamination checks, let users change the weights, and refresh the notice data on a schedule. With one more week we would add the Newport Beach lots and test the ranking with a real acquisitions team.
+For a nonprofit or city to use this next month: confirm current ownership and status for the top sites, re-run the transit check from a second source, add slope and contamination checks, let users change the weights, and refresh the notice data on a schedule. With one more week we would add the Newport Beach lots and test the ranking with a real acquisitions team.
 
 ## Data and privacy
 
