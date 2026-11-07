@@ -1,0 +1,113 @@
+[
+  {
+    "id": "SAMPLE-1",
+    "apn": "000-000-01",
+    "address": "100 Example Ave (sample)",
+    "city": "Santa Ana",
+    "lat": 33.7455,
+    "lon": -117.8677,
+    "acres": 4.2,
+    "general_plan": "Urban Neighborhood",
+    "zoning_listed": "R-3",
+    "existing_use": "Vacant lot",
+    "status": "Available",
+    "source_url": "https://example.org/sample-notice-1",
+    "checks": {
+      "zoning_scag": "Multi-family residential",
+      "housing_element_site": true,
+      "flood_zone": "X (minimal hazard)",
+      "fire_zone": "Not in a fire severity zone",
+      "in_hqta": false
+    },
+    "score": {
+      "total": 79,
+      "available": 30,
+      "size": 14,
+      "zoning": 20,
+      "hazards": 15,
+      "transit": 0
+    },
+    "SAMPLE": true,
+    "sources": {
+      "zoning_scag": "https://maps.scag.ca.gov/scaggis/rest/services/LDX/Zoning_poly_OR/MapServer",
+      "housing_element_site": "https://maps.scag.ca.gov/scaggis/rest/services/LDX/HousingElementSite_poly_scag/MapServer",
+      "flood_zone": "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer",
+      "fire_zone": "https://services.gis.ca.gov/arcgis/rest/services/Environment/Fire_Severity_Zones/MapServer",
+      "in_hqta": "https://caltrans-gis.dot.ca.gov/arcgis/rest/services/CHrailroad/CA_HQ_Transit_Areas/FeatureServer/0"
+    }
+  },
+  {
+    "id": "SAMPLE-2",
+    "apn": "000-000-02",
+    "address": "200 Sample St (sample)",
+    "city": "Anaheim",
+    "lat": 33.8366,
+    "lon": -117.9143,
+    "acres": 1.1,
+    "general_plan": "Commercial",
+    "zoning_listed": "C-G",
+    "existing_use": "Parking lot",
+    "status": "Archive",
+    "source_url": "https://example.org/sample-notice-2",
+    "checks": {
+      "zoning_scag": "General commercial",
+      "housing_element_site": false,
+      "flood_zone": "X (minimal hazard)",
+      "fire_zone": "Not in a fire severity zone",
+      "in_hqta": true
+    },
+    "score": {
+      "total": 40,
+      "available": 0,
+      "size": 5,
+      "zoning": 10,
+      "hazards": 10,
+      "transit": 15
+    },
+    "SAMPLE": true,
+    "sources": {
+      "zoning_scag": "https://maps.scag.ca.gov/scaggis/rest/services/LDX/Zoning_poly_OR/MapServer",
+      "housing_element_site": "https://maps.scag.ca.gov/scaggis/rest/services/LDX/HousingElementSite_poly_scag/MapServer",
+      "flood_zone": "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer",
+      "fire_zone": "https://services.gis.ca.gov/arcgis/rest/services/Environment/Fire_Severity_Zones/MapServer",
+      "in_hqta": "https://caltrans-gis.dot.ca.gov/arcgis/rest/services/CHrailroad/CA_HQ_Transit_Areas/FeatureServer/0"
+    }
+  },
+  {
+    "id": "SAMPLE-3",
+    "apn": "000-000-03",
+    "address": "300 Demo Blvd (sample)",
+    "city": "Irvine",
+    "lat": 33.6846,
+    "lon": -117.8265,
+    "acres": 9.8,
+    "general_plan": "Mixed Use",
+    "zoning_listed": "MU",
+    "existing_use": "Former school",
+    "status": "Available",
+    "source_url": "https://example.org/sample-notice-3",
+    "checks": {
+      "zoning_scag": "Mixed use",
+      "housing_element_site": false,
+      "flood_zone": "AE (high flood risk)",
+      "fire_zone": "Not in a fire severity zone",
+      "in_hqta": true
+    },
+    "score": {
+      "total": 80,
+      "available": 30,
+      "size": 20,
+      "zoning": 10,
+      "hazards": 5,
+      "transit": 15
+    },
+    "SAMPLE": true,
+    "sources": {
+      "zoning_scag": "https://maps.scag.ca.gov/scaggis/rest/services/LDX/Zoning_poly_OR/MapServer",
+      "housing_element_site": "https://maps.scag.ca.gov/scaggis/rest/services/LDX/HousingElementSite_poly_scag/MapServer",
+      "flood_zone": "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer",
+      "fire_zone": "https://services.gis.ca.gov/arcgis/rest/services/Environment/Fire_Severity_Zones/MapServer",
+      "in_hqta": "https://caltrans-gis.dot.ca.gov/arcgis/rest/services/CHrailroad/CA_HQ_Transit_Areas/FeatureServer/0"
+    }
+  }
+]
