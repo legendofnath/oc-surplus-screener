@@ -3,7 +3,7 @@
 > A map and ranked table that helps a small housing nonprofit decide which Orange County surplus-land notices are worth a phone call, with the zoning, hazard and transit checks shown next to each site.
 
 **Team:** OC Surplus Land Screener
-**Members:** legendofnath (integrator, data, README), tanbui (checks and scoring), carcollector25 (app)
+**Members:** legendofnath (integrator, data, README), tanbui (checks and scoring), carcollector25, also known as Sam (app, Newport Beach lot data)
 **Lane:** 1 Find it ("Where can the next affordable home go?")
 **Built at:** Claude Impact Lab: UCI × SoCal Affordable Housing, November 7, 2026
 
